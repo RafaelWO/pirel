@@ -10,7 +10,7 @@ RICH_CONSOLE = Console()
 
 
 app = typer.Typer()
-logger = logging.getLogger("pyrecycle")
+logger = logging.getLogger("pirel")
 
 
 @app.callback(invoke_without_command=True)

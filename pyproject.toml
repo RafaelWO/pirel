@@ -1,5 +1,5 @@
 [project]
-name = "pyrecycle"
+name = "pirel"
 version = "0.1.0"
 description = "The Python release cycle in your terminal"
 readme = "README.md"
@@ -24,7 +24,7 @@ classifiers = [
 ]
 
 [project.scripts]
-pyrc = "pyrecycle.cli:app"
+pirel = "pirel.cli:app"
 
 [build-system]
 requires = ["hatchling"]

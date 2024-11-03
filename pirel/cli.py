@@ -3,7 +3,7 @@ import logging
 import typer
 from rich.console import Console
 
-from . import python_cli
+from .python_cli import get_active_python_info
 from .releases import PythonReleases
 
 RICH_CONSOLE = Console()
@@ -13,15 +13,10 @@ app = typer.Typer()
 logger = logging.getLogger("pirel")
 
 
-@app.callback(invoke_without_command=True)
+@app.command()
 def releases_table():
-    try:
-        py_cli = python_cli.PythonCli()
-        logger.info(f"Found interpreter at {py_cli.path!r} (via {py_cli.cmd!r})")
-        py_version = py_cli.version
-    except FileNotFoundError:
-        logger.warning("Could not find an active Python interpreter")
-        py_version = None
+    py_info = get_active_python_info()
+    py_version = py_info.version if py_info else None
 
     releases = PythonReleases()
     RICH_CONSOLE.print("", releases.to_table(py_version))

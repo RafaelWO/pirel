@@ -1,9 +1,13 @@
+from __future__ import annotations
+
+import logging
 import re
 import subprocess
 import sys
 from dataclasses import dataclass
 
 PYTHON_VERSION_RE = re.compile(r"Python ([23])\.(\d+)\.(\d+)")
+logger = logging.getLogger("pirel")
 
 
 @dataclass(frozen=True)
@@ -13,8 +17,15 @@ class PythonVersion:
     patch: int
 
     @classmethod
-    def from_str(cls, version: str) -> "PythonVersion":
-        return cls(*map(int, version.split(".")))
+    def from_cli(cls, version: str) -> "PythonVersion":
+        match = PYTHON_VERSION_RE.match(version)
+        if not match:
+            raise ValueError(
+                f"The Python version output {version!r} "
+                f"does not match the regex {PYTHON_VERSION_RE.pattern!r}"
+            )
+        major, minor, patch = match.groups()
+        return PythonVersion(major, minor, patch)
 
     @classmethod
     def this(cls) -> "PythonVersion":
@@ -31,34 +42,34 @@ class PythonVersion:
         return f"PythonVersion({self.major}.{self.minor}.{self.patch})"
 
 
-def parse_python_version(python_version_output: str) -> PythonVersion:
-    match = PYTHON_VERSION_RE.match(python_version_output)
-    if not match:
-        raise ValueError(
-            f"The Python version output {python_version_output!r} "
-            f"does not match the regex {PYTHON_VERSION_RE.pattern!r}"
-        )
-    major, minor, patch = match.groups()
-    return PythonVersion(major, minor, patch)
+@dataclass(frozen=True)
+class ActivePythonInfo:
+    cmd: str
+    path: str
+    version: PythonVersion
 
 
-class PythonCli:
-    def __init__(self):
-        version_out = None
-        for py in ("python", "python3", "python2"):
-            try:
-                version_out = subprocess.run((py, "--version"), capture_output=True)
-                self.version = parse_python_version(version_out.stdout.decode())
-                break
-            except (FileNotFoundError, ValueError):
-                pass
+def get_active_python_info() -> ActivePythonInfo | None:
+    # TODO: Check if there is a better way to inspect the active Python version
+    version_out = None
+    for py_cmd in ("python", "python3", "python2"):
+        try:
+            version_out = subprocess.run((py_cmd, "--version"), capture_output=True)
+            version = PythonVersion.from_cli(version_out.stdout.decode())
+            break
+        except (FileNotFoundError, ValueError):
+            logger.debug(
+                f"Failed to get Python version from command {py_cmd!r}", exc_info=True
+            )
 
-        if version_out is None:
-            raise FileNotFoundError("Could not find an active Python interpreter")
+    if version_out is None:
+        logger.warning("Could not find an active Python interpreter")
+        return None
 
-        path_out = subprocess.run(
-            (py, "-c", "import sys; print(sys.executable)"), capture_output=True
-        )
+    path_out = subprocess.run(
+        (py_cmd, "-c", "import sys; print(sys.executable)"), capture_output=True
+    )
+    path = path_out.stdout.decode().strip()
+    logger.info(f"Found interpreter at {path!r} (via {py_cmd!r})")
 
-        self.cmd = py
-        self.path = path_out.stdout.decode().strip()
+    return ActivePythonInfo(cmd=py_cmd, path=path, version=version)

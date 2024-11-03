@@ -3,7 +3,7 @@ import subprocess
 import sys
 from dataclasses import dataclass
 
-PYTHON_VERSION_RE = re.compile(r"^Python ([23])\.(\d+)\.(\d+)$")
+PYTHON_VERSION_RE = re.compile(r"Python ([23])\.(\d+)\.(\d+)")
 
 
 @dataclass(frozen=True)

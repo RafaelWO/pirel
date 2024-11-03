@@ -11,6 +11,9 @@
 </div>
 
 
+![cli-example][cli-example]
+
+
 ## Installation
 It is recommended to install Pirel as a globally available CLI tool via `pipx` (or `uv tool`, etc.).
 This way you Pirel will show you the status of your active Python interpreter.
@@ -29,7 +32,6 @@ pip install pirel
 ## Usage
 Simply type `pirel` in your terminal and you will get a table of all Python releases. Your active Python interpreter is marked with an asterisk.
 
-![cli-example][cli-example]
 
 <!-- Links -->
 [cli-example]: https://raw.githubusercontent.com/RafaelWO/pirel/refs/heads/main/assets/images/cli_demo.gif

@@ -92,9 +92,7 @@ class PythonReleases:
 
         table.add_column("Version", justify="right", style="cyan", no_wrap=True)
         table.add_column("Status", justify="right", no_wrap=True)
-        table.add_column(
-            "Released", justify="right", style="bright_black", no_wrap=True
-        )
+        table.add_column("Released", justify="right", style="grey66", no_wrap=True)
         table.add_column("End-of-life", justify="right", no_wrap=True)
 
         for release in self.releases:
@@ -116,10 +114,3 @@ class PythonReleases:
             )
 
         return table
-
-
-if __name__ == "__main__":
-    from rich.console import Console
-
-    txt = Text("foo", style="italic dark_orange")
-    Console().print(txt)

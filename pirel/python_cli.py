@@ -29,7 +29,7 @@ class PythonVersion:
 
     @classmethod
     def this(cls) -> "PythonVersion":
-        return cls(*sys.version_info)
+        return cls(*sys.version_info[:3])
 
     @property
     def as_release(self) -> str:

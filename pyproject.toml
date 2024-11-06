@@ -5,8 +5,8 @@ description = "The Python release cycle in your terminal"
 readme = "README.md"
 requires-python = ">=3.8"
 dependencies = [
-    "rich>=13.9.2",
-    "typer>=0.12.5",
+  "rich>=13.9.2",
+  "typer>=0.12.5",
 ]
 
 # Pypi classifiers: https://pypi.org/classifiers/
@@ -30,3 +30,12 @@ pirel = "pirel.cli:app"
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+  "pytest>=8.3.3",
+  "pytest-cov>=5.0.0",
+]
+
+[tool.pytest.ini_options]
+addopts = "--cov=pirel --cov-report term-missing"

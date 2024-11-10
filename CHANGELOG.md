@@ -19,6 +19,8 @@ Types of changes:
 
 ### Added
 * This Changelog
+* `typing-extensions` as dependency
+* Use rich for logging and add option to configure verbosity (`-v, --verbose`)
 
 ## [0.1.1] - 2024-11-03
 

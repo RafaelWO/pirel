@@ -1,5 +1,6 @@
 import datetime
 import json
+import logging
 import urllib.request
 from typing import Optional
 
@@ -10,6 +11,9 @@ from . import python_cli
 
 DATE_NOW = datetime.date.today()
 DATE_NOW_STR = str(DATE_NOW)
+RELEASE_CYCLE_URL = "https://raw.githubusercontent.com/python/devguide/refs/heads/main/include/release-cycle.json"
+
+logger = logging.getLogger("pirel")
 
 
 def parse_date(date_str: str) -> datetime.date:
@@ -76,9 +80,10 @@ class PythonRelease:
 
 class PythonReleases:
     def __init__(self) -> None:
-        with urllib.request.urlopen(
-            "https://raw.githubusercontent.com/python/devguide/refs/heads/main/include/release-cycle.json"
-        ) as f:
+        logger.debug(
+            f"Downloading Python release cycle data from URL {RELEASE_CYCLE_URL}"
+        )
+        with urllib.request.urlopen(RELEASE_CYCLE_URL) as f:
             self.releases_data = json.load(f)
 
         self.releases = [

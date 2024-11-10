@@ -35,3 +35,12 @@ Simply type `pirel` in your terminal and you will get a table of all Python rele
 
 <!-- Links -->
 [cli-example]: https://raw.githubusercontent.com/RafaelWO/pirel/refs/heads/main/assets/images/cli_demo.gif
+
+## Contributing
+PRs are welcome! 🤗
+
+This project uses [uv](https://github.com/astral-sh/uv) to manage packaging.
+Please check the [corresponding docs](https://docs.astral.sh/uv/) for installation instructions.
+
+Before you commit any changes, please ensure that you have [pre-commit](https://pre-commit.com)
+available on your system. Run `pre-commit install` to install the project's hooks.

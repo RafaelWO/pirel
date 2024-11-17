@@ -1,8 +1,17 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [project]
 name = "pirel"
 version = "0.1.1"
 description = "The Python release cycle in your terminal"
+authors = [
+  {name = "Rafael Weingartner-Ortner", email = "weingartner.rafael@hotmail.com"}
+]
 readme = "README.md"
+license = {file = "LICENSE"}
+
 requires-python = ">=3.8"
 dependencies = [
   "rich>=13.9.2",
@@ -10,11 +19,12 @@ dependencies = [
   "typing-extensions>=4.12.2",
 ]
 
+keywords = ["cli", "python", "releases"]
 # Pypi classifiers: https://pypi.org/classifiers/
 classifiers = [
-  "Development Status :: 4 - Beta",
+  "Development Status :: 3 - Alpha",
   "Intended Audience :: Developers",
-  "Topic :: Software Development :: Libraries :: Python Modules",
+  "Topic :: Software Development",
   "License :: OSI Approved :: MIT License",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3.8",
@@ -25,12 +35,14 @@ classifiers = [
   "Programming Language :: Python :: 3.13",
 ]
 
+[project.urls]
+Homepage = "https://github.com/RafaelWO/pirel"
+Repository = "https://github.com/RafaelWO/pirel"
+Issues  = "https://github.com/RafaelWO/pirel/issues"
+Changelog = "https://github.com/RafaelWO/pirel/blob/main/CHANGELOG.md"
+
 [project.scripts]
 pirel = "pirel.cli:app"
-
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
 
 [dependency-groups]
 dev = [

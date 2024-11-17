@@ -70,6 +70,6 @@ def get_active_python_info() -> ActivePythonInfo | None:
         (py_cmd, "-c", "import sys; print(sys.executable)"), capture_output=True
     )
     path = path_out.stdout.decode().strip()
-    logger.info(f"Found interpreter at {path!r} (via {py_cmd!r})")
+    logger.info(f"Found active Python interpreter at {path!r} (command {py_cmd!r})")
 
     return ActivePythonInfo(cmd=py_cmd, path=path, version=version)

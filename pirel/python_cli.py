@@ -17,7 +17,7 @@ class PythonVersion:
     patch: int
 
     @classmethod
-    def from_cli(cls, version: str) -> "PythonVersion":
+    def from_cli(cls, version: str) -> PythonVersion:
         match = PYTHON_VERSION_RE.match(version)
         if not match:
             raise ValueError(
@@ -28,7 +28,7 @@ class PythonVersion:
         return PythonVersion(major, minor, patch)
 
     @classmethod
-    def this(cls) -> "PythonVersion":
+    def this(cls) -> PythonVersion:
         return cls(*sys.version_info[:3])
 
     @property
@@ -50,16 +50,17 @@ class ActivePythonInfo:
 
 
 def get_active_python_info() -> ActivePythonInfo | None:
-    # TODO: Check if there is a better way to inspect the active Python version
     version_out = None
-    for py_cmd in ("python", "python3", "python2"):
+    for py_exe in ("python", "python3", "python2"):
         try:
-            version_out = subprocess.run((py_cmd, "--version"), capture_output=True)
+            logger.debug(f"Trying command `{py_exe}`")
+            # TODO: Check if there is a better way to inspect the active Python version
+            version_out = subprocess.run((py_exe, "--version"), capture_output=True)
             version = PythonVersion.from_cli(version_out.stdout.decode())
             break
         except (FileNotFoundError, ValueError):
             logger.debug(
-                f"Failed to get Python version from command {py_cmd!r}", exc_info=True
+                f"Failed to get Python version from command {py_exe!r}", exc_info=True
             )
 
     if version_out is None:
@@ -67,9 +68,9 @@ def get_active_python_info() -> ActivePythonInfo | None:
         return None
 
     path_out = subprocess.run(
-        (py_cmd, "-c", "import sys; print(sys.executable)"), capture_output=True
+        (py_exe, "-c", "import sys; print(sys.executable)"), capture_output=True
     )
     path = path_out.stdout.decode().strip()
-    logger.info(f"Found active Python interpreter at {path!r} (command {py_cmd!r})")
+    logger.info(f"Found active Python interpreter at {path!r} (command {py_exe!r})")
 
-    return ActivePythonInfo(cmd=py_cmd, path=path, version=version)
+    return ActivePythonInfo(cmd=py_exe, path=path, version=version)

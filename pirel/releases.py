@@ -66,7 +66,7 @@ def status_style(status: str) -> str:
 def eol_color(eol: datetime.date) -> str:
     if DATE_NOW >= eol:
         return "red"
-    elif datetime.timedelta(days=30 * 2) + DATE_NOW > eol:
+    elif datetime.timedelta(days=30 * 6) + DATE_NOW > eol:
         return "dark_orange"
     elif datetime.timedelta(days=365) + DATE_NOW > eol:
         return "yellow"

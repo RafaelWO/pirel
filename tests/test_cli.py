@@ -1,3 +1,4 @@
+import datetime
 import logging
 import pathlib
 import re
@@ -37,8 +38,8 @@ RELEASES_TABLE = """
 
 PYVER_TO_CHECK_OUTPUT = {
     "3.8": ":warning: You are using Python 3.8 which has reached end-of-file! Please upgrade to a newer version of Python (EOL 2024-10-07)",
-    "3.9": ":heavy_check_mark: You are using Python 3.9 which has security support for more than 0 years (EOL 2025-10-01)",
-    "3.10": ":heavy_check_mark: You are using Python 3.10 which has security support for more than 1 years (EOL 2026-10-01)",
+    "3.9": ":heavy_check_mark: You are using Python 3.9 which has security support for more than 10 months (EOL 2025-10-01)",
+    "3.10": ":heavy_check_mark: You are using Python 3.10 which has security support for more than 1 year, 10 months (EOL 2026-10-01)",
     "3.11": ":heavy_check_mark: You are using Python 3.11 which has security support for more than 2 years (EOL 2027-10-01)",
     "3.12": ":rocket: You are using Python 3.12 which is actively maintained (bugfixes) and has security support for more than 3 years (EOL 2028-10-01)",
     "3.13": ":rocket: You are using Python 3.13 which is actively maintained (bugfixes) and has security support for more than 4 years (EOL 2029-10-01)",
@@ -53,12 +54,20 @@ def mock_rich_no_wrap():
 
 @pytest.fixture
 def mock_release_cycle_file():
-    data_path = pathlib.Path(__file__).parent / "data" / "release-cycle_2024-11-03.json"
+    date_freeze = "2024-11-03"
+    data_path = (
+        pathlib.Path(__file__).parent / "data" / f"release-cycle_{date_freeze}.json"
+    )
     with open(data_path) as file:
         with mock.patch("pirel.releases.urllib.request.urlopen") as mock_urlopen:
             # Mock call to release cycle data
             mock_urlopen.return_value.__enter__.return_value = file
-            yield
+
+            # Mock date for reproducability
+            with mock.patch(
+                "pirel.releases.DATE_NOW", datetime.date.fromisoformat(date_freeze)
+            ):
+                yield
 
 
 @pytest.fixture

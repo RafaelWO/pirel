@@ -6,19 +6,19 @@ import logging
 import urllib.request
 from typing import Any, Optional
 
+import humanize
 from rich.table import Table
 
 from . import python_cli
 
 DATE_NOW = datetime.date.today()
-DATE_NOW_STR = str(DATE_NOW)
 RELEASE_CYCLE_URL = "https://raw.githubusercontent.com/python/devguide/refs/heads/main/include/release-cycle.json"
 
 STATUS_TO_TEXT = {
     "feature": "is [bold]not released yet[/bold] and still accepts new features",
     "prerelease": "is [bold]not released yet[/bold] and still accepts new fixes",
-    "bugfix": "is actively maintained (bugfixes) and has security support for more than {eol_delta} years",
-    "security": "has security support for more than {eol_delta} years",
+    "bugfix": "is actively maintained (bugfixes) and has security support for more than {eol_delta}",
+    "security": "has security support for more than {eol_delta}",
     "end-of-life": "has reached end-of-file! Please upgrade to a newer version of Python",
 }
 
@@ -88,11 +88,16 @@ class PythonRelease:
         self._end_of_life = parse_date(data["end_of_life"])
 
     def __str__(self) -> str:
-        eol_delta_years = (self._end_of_life - DATE_NOW).days // 365
-        status_info = STATUS_TO_TEXT[self._status].format(eol_delta=eol_delta_years)
+        status_info = STATUS_TO_TEXT[self._status].format(
+            eol_delta=humanize.naturaldelta(self._end_of_life - DATE_NOW)
+        )
         main_style = status_style(self._status)
         _eol_color = eol_color(self._end_of_life)
-        return f"{STATUS_TO_EMOJI[self._status]} [{main_style} bold]You are using Python {self.version}[/] which {status_info} [{_eol_color}](EOL {self._end_of_life})[/{_eol_color}]"
+        return (
+            f"{STATUS_TO_EMOJI[self._status]} [{main_style} bold]"
+            f"You are using Python {self.version}[/] which {status_info}"
+            f" [{_eol_color}](EOL {self._end_of_life})[/{_eol_color}]"
+        )
 
     @property
     def version(self) -> str:

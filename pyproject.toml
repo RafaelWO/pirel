@@ -53,3 +53,6 @@ dev = [
 
 [tool.pytest.ini_options]
 addopts = "--cov=pirel --cov-report term-missing"
+
+[tool.ruff]
+line-length = 88

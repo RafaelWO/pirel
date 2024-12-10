@@ -27,18 +27,13 @@ Type "python -V"
 Enter
 Sleep 1s
 
-# Run Pirel
-Type "pirel"
+# Run Pirel check
+Type "pirel check"
 Sleep 500ms
 Enter
 
 # Admire the output for a bit.
 Sleep 5s
-
-# Clear the screen
-Type "clear"
-Sleep 500ms
-Enter
 
 # Activate Python 3.8
 Type "pyenv shell 3.8"
@@ -51,8 +46,21 @@ Type "python -V"
 Enter
 Sleep 1s
 
-# Run Pirel
-Type "pirel"
+# Run Pirel check
+Type "pirel check"
+Sleep 500ms
+Enter
+
+# Admire the output for a bit.
+Sleep 5s
+
+# Clear the screen
+Type "clear"
+Sleep 500ms
+Enter
+
+# Run Pirel list
+Type "pirel list"
 Sleep 500ms
 Enter
 

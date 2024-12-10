@@ -116,6 +116,15 @@ wheels = [
 ]
 
 [[package]]
+name = "humanize"
+version = "4.10.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/5d/b1/c8f05d5dc8f64030d8cc71e91307c1daadf6ec0d70bcd6eabdfd9b6f153f/humanize-4.10.0.tar.gz", hash = "sha256:06b6eb0293e4b85e8d385397c5868926820db32b9b654b932f57fa41c23c9978", size = 79192 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/8f/49/a29c79bea335e52fb512a43faf84998c184c87fef82c65f568f8c56f2642/humanize-4.10.0-py3-none-any.whl", hash = "sha256:39e7ccb96923e732b5c2e27aeaa3b10a8dfeeba3eb965ba7b74a3eb0e30040a6", size = 126957 },
+]
+
+[[package]]
 name = "iniconfig"
 version = "2.0.0"
 source = { registry = "https://pypi.org/simple" }
@@ -159,6 +168,7 @@ name = "pirel"
 version = "0.1.1"
 source = { editable = "." }
 dependencies = [
+    { name = "humanize" },
     { name = "rich" },
     { name = "typer" },
     { name = "typing-extensions" },
@@ -172,6 +182,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "humanize", specifier = ">=4.10.0" },
     { name = "rich", specifier = ">=13.9.2" },
     { name = "typer", specifier = ">=0.12.5" },
     { name = "typing-extensions", specifier = ">=4.12.2" },

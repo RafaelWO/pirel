@@ -17,10 +17,16 @@ Types of changes:
 
 ## [Unreleased]
 
+## [0.2.0] - 2024-12-15
+
 ### Added
-* This Changelog
-* `typing-extensions` as dependency
-* Use rich for logging and add option to configure verbosity (`-v, --verbose`)
+* Add new subcommand `check` that prints a short info about your active Python version (#4)
+* Use rich for logging and add option to configure verbosity via `-v, --verbose` (#3)
+* Add CHANGELOG file (#3)
+
+### Changed
+* Move previous root command to subcommand `list` (#4)
+  * To support backwards compatibility, invoking `pirel` will default to `pirel list`
 
 ## [0.1.1] - 2024-11-03
 
@@ -41,6 +47,7 @@ Types of changes:
 * Basic CLI app that shows all Python releases with the active Python interpeter being highlighted
 
 
-[unreleased]: https://github.com/RafaelWO/pirel/compare/0.1.1...HEAD
+[unreleased]: https://github.com/RafaelWO/pirel/compare/0.2.0...HEAD
+[0.2.0]: https://github.com/RafaelWO/pirel/compare/0.1.1...0.2.0
 [0.1.1]: https://github.com/RafaelWO/pirel/compare/0.1.0...0.1.1
 [0.1.0]: https://github.com/RafaelWO/pirel/releases/tag/0.1.0

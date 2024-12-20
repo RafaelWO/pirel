@@ -24,8 +24,7 @@ class PythonVersion:
                 f"The Python version output {version!r} "
                 f"does not match the regex {PYTHON_VERSION_RE.pattern!r}"
             )
-        major, minor, patch = match.groups()
-        return PythonVersion(major, minor, patch)
+        return PythonVersion(*map(int, match.groups()))
 
     @classmethod
     def this(cls) -> PythonVersion:

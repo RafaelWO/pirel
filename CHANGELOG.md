@@ -13,9 +13,20 @@ Types of changes:
     Removed for now removed features.
     Fixed for any bug fixes.
     Security in case of vulnerabilities.
+    -- custom --
+    Internal for changes not effecting package users (e.g. CI, dev tools, etc).
 -->
 
 ## [Unreleased]
+
+## [0.2.1] - 2024-12-20
+
+## Fixed
+* Fix typo in end-of-life status message (#6)
+
+## Internal
+* Restructure and reformat README (#6)
+* Add mypy to test suite (#7)
 
 ## [0.2.0] - 2024-12-15
 
@@ -47,7 +58,8 @@ Types of changes:
 * Basic CLI app that shows all Python releases with the active Python interpeter being highlighted
 
 
-[unreleased]: https://github.com/RafaelWO/pirel/compare/0.2.0...HEAD
+[unreleased]: https://github.com/RafaelWO/pirel/compare/0.2.1...HEAD
+[0.2.1]: https://github.com/RafaelWO/pirel/compare/0.2.0...0.2.1
 [0.2.0]: https://github.com/RafaelWO/pirel/compare/0.1.1...0.2.0
 [0.1.1]: https://github.com/RafaelWO/pirel/compare/0.1.0...0.1.1
 [0.1.0]: https://github.com/RafaelWO/pirel/releases/tag/0.1.0

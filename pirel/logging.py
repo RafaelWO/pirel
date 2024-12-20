@@ -3,7 +3,7 @@ import logging
 from rich.logging import RichHandler
 
 
-def setup_logging(verbosity: int = 0):
+def setup_logging(verbosity: int = 0) -> None:
     """Sets up the basic logging configuration.
 
     Args:

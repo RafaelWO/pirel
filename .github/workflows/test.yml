@@ -31,5 +31,8 @@ jobs:
     - name: Install the project
       run: uv sync --all-extras --dev
 
+    - name: Run mypy
+      run: uv run mypy pirel/
+
     - name: Run tests
       run: uv run pytest tests/

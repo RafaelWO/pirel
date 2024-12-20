@@ -81,7 +81,7 @@ def wrap_style(text: str, style: str) -> str:
 
 
 class PythonRelease:
-    def __init__(self, version: str, data: dict):
+    def __init__(self, version: str, data: dict[str, Any]):
         self._version = version
         self._status = data["status"]
         self._released = parse_date(data["first_release"])
@@ -102,10 +102,6 @@ class PythonRelease:
     @property
     def version(self) -> str:
         return self._version
-
-    @property
-    def version_tuple(self) -> tuple[int, int]:
-        return self._version.split(".")
 
     @property
     def status(self) -> str:

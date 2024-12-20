@@ -1,5 +1,6 @@
 import logging
 import sys
+from typing import Optional
 
 import typer
 from rich.console import Console
@@ -20,9 +21,9 @@ app = typer.Typer(name="pirel")
 logger = logging.getLogger("pirel")
 
 
-def logging_callback(ctx: typer.Context, verbosity: int):
+def logging_callback(ctx: typer.Context, verbosity: int) -> Optional[int]:
     if ctx.resilient_parsing:
-        return
+        return None
 
     setup_logging(verbosity)
     return verbosity
@@ -40,7 +41,7 @@ VERBOSE_OPTION = Annotated[
 ]
 
 
-def print_releases():
+def print_releases() -> None:
     """Prints all Python releases as a table."""
     py_info = get_active_python_info()
     py_version = py_info.version if py_info else None
@@ -55,7 +56,7 @@ def print_releases():
 def redirect_no_command_to_list(
     ctx: typer.Context,
     verbose: Annotated[int, typer.Option("--verbose", "-v", count=True)] = 0,
-):
+) -> None:
     if not ctx.invoked_subcommand:
         setup_logging(verbose)
         logger.warning(
@@ -67,13 +68,13 @@ def redirect_no_command_to_list(
 
 
 @app.command("list")
-def list_releases(verbose: VERBOSE_OPTION = 0):
+def list_releases(verbose: VERBOSE_OPTION = 0) -> None:
     """Lists all Python releases in a table. Your active Python interpreter is highlighted."""
     print_releases()
 
 
 @app.command("check")
-def check_release(verbose: VERBOSE_OPTION = 0):
+def check_release(verbose: VERBOSE_OPTION = 0) -> None:
     """Shows release information about your active Python interpreter.
 
     If no active Python interpreter is found, the program exits with code 2.

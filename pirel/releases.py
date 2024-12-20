@@ -19,7 +19,7 @@ STATUS_TO_TEXT = {
     "prerelease": "is [bold]not released yet[/bold] and still accepts new fixes",
     "bugfix": "is actively maintained (bugfixes) and has security support for more than {eol_delta}",
     "security": "has security support for more than {eol_delta}",
-    "end-of-life": "has reached end-of-file! Please upgrade to a newer version of Python",
+    "end-of-life": "has reached end-of-life! Please upgrade to a newer version of Python",
 }
 
 STATUS_TO_EMOJI = {

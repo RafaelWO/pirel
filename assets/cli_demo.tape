@@ -1,5 +1,5 @@
 # Output path of the GIF
-Output images/cli_demo.gif
+Output assets/images/cli_demo.gif
 
 Require pyenv
 

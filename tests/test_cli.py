@@ -37,7 +37,7 @@ RELEASES_TABLE = """
 """.strip()
 
 PYVER_TO_CHECK_OUTPUT = {
-    "3.8": ":warning: You are using Python 3.8 which has reached end-of-file! Please upgrade to a newer version of Python (EOL 2024-10-07)",
+    "3.8": ":warning: You are using Python 3.8 which has reached end-of-life! Please upgrade to a newer version of Python (EOL 2024-10-07)",
     "3.9": ":heavy_check_mark: You are using Python 3.9 which has security support for more than 10 months (EOL 2025-10-01)",
     "3.10": ":heavy_check_mark: You are using Python 3.10 which has security support for more than 1 year, 10 months (EOL 2026-10-01)",
     "3.11": ":heavy_check_mark: You are using Python 3.11 which has security support for more than 2 years (EOL 2027-10-01)",

@@ -38,12 +38,12 @@ Usage: pirel check [OPTIONS]
 Shows release information about your active Python interpreter.
 If no active Python interpreter is found, the program exits with code 2.
 
-╭─ Options ──────────────────────────────────────────────────────────────────────────────────────────────╮
-│ --verbose  -v      INTEGER  Enable verbose logging; can be supplied multiple times to increase         │
-│                             verbosity.                                                                 │
-│                             [default: 0]                                                               │
-│ --help                      Show this message and exit.                                                │
-╰────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+╭─ Options ───────────────────────────────────────────────────────────────────────────────╮
+│ --verbose  -v      INTEGER  Enable verbose logging; can be supplied multiple times to   │
+│                             increase verbosity.                                         │
+│                             [default: 0]                                                │
+│ --help                      Show this message and exit.                                 │
+╰─────────────────────────────────────────────────────────────────────────────────────────╯
 ```
 
 
@@ -53,29 +53,17 @@ Usage: pirel list [OPTIONS]
 
 Lists all Python releases in a table. Your active Python interpreter is highlighted.
 
-╭─ Options ──────────────────────────────────────────────────────────────────────────────────────────────╮
-│ --verbose  -v      INTEGER  Enable verbose logging; can be supplied multiple times to increase         │
-│                             verbosity.                                                                 │
-│                             [default: 0]                                                               │
-│ --help                      Show this message and exit.                                                │
-╰────────────────────────────────────────────────────────────────────────────────────────────────────────╯
-
+╭─ Options ───────────────────────────────────────────────────────────────────────────────╮
+│ --verbose  -v      INTEGER  Enable verbose logging; can be supplied multiple times to   │
+│                             increase verbosity.                                         │
+│                             [default: 0]                                                │
+│ --help                      Show this message and exit.                                 │
+╰─────────────────────────────────────────────────────────────────────────────────────────╯
 ```
 
-> [!NOTE] FOO
+> [!NOTE]
 > You can still invoke `pirel` without a subcommand and you will get a table of all Python releases.
 > But note that this is **deprecated**, i.e. please use `pirel list`.
-
-
-## Development
-### Generate Video Demo
-To generate the video demo on the top, I used [vhs](https://github.com/charmbracelet/vhs).
-
-If you change something in the "tape" file `./assets/cli_demo.tape` do the following to
-update the GIF.
-
-1. `cd assets`
-2. `vhs cli_demo.tape`
 
 
 ## Contributing
@@ -86,6 +74,14 @@ Please check the [corresponding docs](https://docs.astral.sh/uv/) for installati
 
 Before you commit any changes, please ensure that you have [pre-commit](https://pre-commit.com)
 available on your system. Run `pre-commit install` to install the project's hooks.
+
+
+## Development
+### Generate Video Demo
+To generate the video demo on the top, I used [vhs](https://github.com/charmbracelet/vhs).
+
+If you change something in the "tape" file `./assets/cli_demo.tape` run the following
+command to update the GIF: `vhs assets/cli_demo.tape`
 
 
 <!-- Links -->

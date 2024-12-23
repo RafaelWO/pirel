@@ -78,6 +78,7 @@ def list_releases() -> None:
 def check_release() -> None:
     """Shows release information about your active Python interpreter.
 
+    If the active version is end-of-life, the program exits with code 1.
     If no active Python interpreter is found, the program exits with code 2.
     """
     py_info = get_active_python_info()
@@ -91,6 +92,9 @@ def check_release() -> None:
     active_release = releases[py_info.version.as_release]
 
     RICH_CONSOLE.print(f"\n{active_release}", highlight=False)
+
+    if active_release.is_eol:
+        raise typer.Exit(code=1)
 
 
 if __name__ == "__main__":

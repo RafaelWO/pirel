@@ -80,7 +80,12 @@ def releases_table():
 
 @pytest.mark.parametrize("args, log_count", [(None, 2), ("list", 0)])
 def test_pirel_list(
-    args, log_count, mock_rich_no_wrap, mock_release_cycle_file, releases_table, caplog
+    args,
+    log_count,
+    mock_rich_no_wrap,
+    mock_release_cycle_file,
+    releases_table,
+    caplog,
 ):
     caplog.set_level(logging.WARNING)
 
@@ -105,10 +110,13 @@ def test_pirel_list(
 
 def test_pirel_check(mock_rich_no_wrap, mock_release_cycle_file):
     pyver = PythonVersion.this()
+    expected_exit_code = (
+        1 if "end-of-life" in PYVER_TO_CHECK_OUTPUT[pyver.as_release] else 0
+    )
 
     # Call CLI
     result = runner.invoke(app, "check")
-    assert result.exit_code == 0, result.stdout
+    assert result.exit_code == expected_exit_code, result.stdout
 
     # Check output
     output = result.stdout.strip()

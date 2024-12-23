@@ -50,15 +50,16 @@ def print_releases() -> None:
     RICH_CONSOLE.print(releases.to_table(py_version), new_line_start=True)
 
 
-# This callback is a hack to "redirect" to the `list` command if no command is passed.
-# This will be removed in a future version.
 @app.callback(invoke_without_command=True)
-def redirect_no_command_to_list(
+def main(
     ctx: typer.Context,
-    verbose: Annotated[int, typer.Option("--verbose", "-v", count=True)] = 0,
+    verbose: VERBOSE_OPTION = 0,
 ) -> None:
+    """The Python release cycle in your terminal."""
     if not ctx.invoked_subcommand:
-        setup_logging(verbose)
+        # This hack is for backwards compatibility that "redirects" to the `list`
+        # command if no command is passed.
+        # This will be removed in a future version.
         logger.warning(
             "Invoking `pirel` without a command is deprecated"
             " and will be removed in a future version."
@@ -68,20 +69,22 @@ def redirect_no_command_to_list(
 
 
 @app.command("list")
-def list_releases(verbose: VERBOSE_OPTION = 0) -> None:
+def list_releases() -> None:
     """Lists all Python releases in a table. Your active Python interpreter is highlighted."""
     print_releases()
 
 
 @app.command("check")
-def check_release(verbose: VERBOSE_OPTION = 0) -> None:
+def check_release() -> None:
     """Shows release information about your active Python interpreter.
 
     If no active Python interpreter is found, the program exits with code 2.
     """
     py_info = get_active_python_info()
     if not py_info:
-        logger.error("Could not find active Python interpreter in PATH.")
+        logger.error(
+            "Could not find active Python interpreter in PATH. Try to run with `--verbose`"
+        )
         raise typer.Exit(code=2)
 
     releases = load_releases()

@@ -5,6 +5,8 @@ from typing import Optional
 import typer
 from rich.console import Console
 
+import pirel
+
 from .logging import setup_logging
 from .python_cli import get_active_python_info
 from .releases import load_releases
@@ -27,6 +29,12 @@ def logging_callback(ctx: typer.Context, verbosity: int) -> Optional[int]:
 
     setup_logging(verbosity)
     return verbosity
+
+
+def version_callback(value: bool) -> None:
+    if value:
+        print(f"pirel {pirel.__version__}")
+        raise typer.Exit()
 
 
 VERBOSE_OPTION = Annotated[
@@ -54,6 +62,15 @@ def print_releases() -> None:
 def main(
     ctx: typer.Context,
     verbose: VERBOSE_OPTION = 0,
+    version: Annotated[
+        Optional[bool],
+        typer.Option(
+            "--version",
+            help="Dispay the version of pirel",
+            callback=version_callback,
+            is_eager=True,
+        ),
+    ] = None,
 ) -> None:
     """The Python release cycle in your terminal."""
     if not ctx.invoked_subcommand:

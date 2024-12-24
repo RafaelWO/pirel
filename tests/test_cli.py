@@ -8,6 +8,7 @@ import pytest
 from rich.console import Console
 from typer.testing import CliRunner
 
+import pirel
 from pirel.cli import app
 from pirel.python_cli import PythonVersion
 
@@ -130,3 +131,9 @@ def test_pirel_check_no_interpreter():
         # Call CLI
         result = runner.invoke(app, "check")
         assert result.exit_code == 2, result.stdout
+
+
+def test_pirel_version():
+    result = runner.invoke(app, "--version")
+    assert result.exit_code == 0
+    assert result.stdout.strip() == f"pirel {pirel.__version__}"

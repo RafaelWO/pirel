@@ -83,7 +83,7 @@ def wrap_style(text: str, style: str) -> str:
 class PythonRelease:
     def __init__(self, version: str, data: dict[str, Any]):
         self._version = version
-        self._status = data["status"]
+        self._status: str = data["status"]
         self._released = parse_date(data["first_release"])
         self._end_of_life = parse_date(data["end_of_life"])
 
@@ -116,6 +116,10 @@ class PythonRelease:
         font_style = date_style(self._end_of_life)
         color = eol_color(self._end_of_life)
         return wrap_style(str(self._end_of_life), style=f"{font_style} {color}")
+
+    @property
+    def is_eol(self) -> bool:
+        return self._status == "end-of-life"
 
 
 class PythonReleases:

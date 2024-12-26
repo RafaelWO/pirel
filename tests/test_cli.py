@@ -2,13 +2,18 @@ import datetime
 import logging
 import pathlib
 import re
+import shutil
+import traceback
 from unittest import mock
 
+import click.testing
 import pytest
+from freezegun import freeze_time
 from rich.console import Console
 from typer.testing import CliRunner
 
 import pirel
+from pirel import _cache
 from pirel.cli import app
 from pirel.python_cli import PythonVersion
 
@@ -45,6 +50,16 @@ PYVER_TO_CHECK_OUTPUT = {
     "3.12": ":rocket: You are using Python 3.12 which is actively maintained (bugfixes) and has security support for more than 3 years (EOL 2028-10-01)",
     "3.13": ":rocket: You are using Python 3.13 which is actively maintained (bugfixes) and has security support for more than 4 years (EOL 2029-10-01)",
 }
+DATE_FREEZE = datetime.date(2024, 11, 3)
+RELEASE_CYCLE_DATA_PATH = (
+    pathlib.Path(__file__).parent / "data" / f"release-cycle_{DATE_FREEZE}.json"
+)
+
+
+@pytest.fixture(scope="session")
+def mock_time():
+    with mock.patch("pirel.releases.DATE_NOW", DATE_FREEZE), freeze_time(DATE_FREEZE):
+        yield
 
 
 @pytest.fixture(scope="module")
@@ -54,21 +69,44 @@ def mock_rich_no_wrap():
 
 
 @pytest.fixture
-def mock_release_cycle_file():
-    date_freeze = "2024-11-03"
-    data_path = (
-        pathlib.Path(__file__).parent / "data" / f"release-cycle_{date_freeze}.json"
-    )
-    with open(data_path) as file:
+def release_cycle_file():
+    with RELEASE_CYCLE_DATA_PATH.open() as file:
+        yield file
+
+
+@pytest.fixture(
+    params=[
+        # cache file name, validity
+        (None, False),
+        (f"{DATE_FREEZE}_release-cycle.json", True),
+        (f"{DATE_FREEZE - datetime.timedelta(days=10)}_release-cycle.json", False),
+    ],
+    ids=["no_cache", "valid_cache", "old_cache"],
+)
+def cache_file(request, tmp_path):
+    cache_dir = tmp_path / "pirel"
+    cache_file_name, is_valid = request.param
+    if cache_file_name:
+        cache_dir.mkdir()
+        _cache_file = shutil.copyfile(
+            RELEASE_CYCLE_DATA_PATH, cache_dir / cache_file_name
+        )
+    # invalidate function cache
+    _cache.get_latest_cache_file.cache_clear()
+
+    with mock.patch("pirel._cache.CACHE_DIR", cache_dir):
+        yield _cache_file if cache_file_name else None, is_valid
+
+
+@pytest.fixture
+def mock_release_cycle_file(mock_time, release_cycle_file, cache_file):
+    # Mock date for reproducability
+    with mock.patch("pirel.releases.DATE_NOW", DATE_FREEZE):
         with mock.patch("pirel.releases.urllib.request.urlopen") as mock_urlopen:
             # Mock call to release cycle data
-            mock_urlopen.return_value.__enter__.return_value = file
+            mock_urlopen.return_value.__enter__.return_value = release_cycle_file
 
-            # Mock date for reproducability
-            with mock.patch(
-                "pirel.releases.DATE_NOW", datetime.date.fromisoformat(date_freeze)
-            ):
-                yield
+            yield mock_urlopen, cache_file[1]
 
 
 @pytest.fixture
@@ -79,20 +117,43 @@ def releases_table():
     return table
 
 
-@pytest.mark.parametrize("args, log_count", [(None, 2), ("list", 0)])
+@pytest.fixture(
+    params=[tuple(), ("--no-cache",)], ids=lambda x: ",".join(x) if x else "none"
+)
+def global_cli_args(request):
+    return request.param
+
+
+def check_exit_code(result: click.testing.Result, code: int = 0):
+    """
+    Helper to check the exit code of a typer/click app and inlcude the traceback if any.
+    """
+    assert result.exit_code == code, "\n".join(
+        [result.stdout, *traceback.format_exception(*result.exc_info)]
+    )
+
+
+@pytest.mark.parametrize(
+    "args, log_count", [(None, 2), ("list", 0)], ids=["root", "list"]
+)
 def test_pirel_list(
     args,
     log_count,
     mock_rich_no_wrap,
     mock_release_cycle_file,
     releases_table,
+    global_cli_args,
     caplog,
 ):
     caplog.set_level(logging.WARNING)
+    mock_urlopen, is_cache_valid = mock_release_cycle_file
 
     # Call CLI
-    result = runner.invoke(app, args)
-    assert result.exit_code == 0, result.stdout
+    _args = [*global_cli_args]
+    if args:
+        _args.append(args)
+    result = runner.invoke(app, _args)
+    check_exit_code(result)
 
     # Check output
     output = result.stdout.strip()
@@ -108,20 +169,32 @@ def test_pirel_list(
     if args is None:
         assert logs[-1] == "Please use `pirel list` instead."
 
+    if is_cache_valid and "--no-cache" not in _args:
+        mock_urlopen.assert_not_called()
+    else:
+        mock_urlopen.assert_called_once()
 
-def test_pirel_check(mock_rich_no_wrap, mock_release_cycle_file):
+
+def test_pirel_check(mock_rich_no_wrap, mock_release_cycle_file, global_cli_args):
+    mock_urlopen, is_cache_valid = mock_release_cycle_file
     pyver = PythonVersion.this()
     expected_exit_code = (
         1 if "end-of-life" in PYVER_TO_CHECK_OUTPUT[pyver.as_release] else 0
     )
 
     # Call CLI
-    result = runner.invoke(app, "check")
-    assert result.exit_code == expected_exit_code, result.stdout
+    _args = [*global_cli_args, "check"]
+    result = runner.invoke(app, _args)
+    check_exit_code(result, code=expected_exit_code)
 
     # Check output
     output = result.stdout.strip()
     assert output == PYVER_TO_CHECK_OUTPUT[pyver.as_release]
+
+    if is_cache_valid and "--no-cache" not in _args:
+        mock_urlopen.assert_not_called()
+    else:
+        mock_urlopen.assert_called_once()
 
 
 def test_pirel_check_no_interpreter():
@@ -130,10 +203,11 @@ def test_pirel_check_no_interpreter():
 
         # Call CLI
         result = runner.invoke(app, "check")
-        assert result.exit_code == 2, result.stdout
+        check_exit_code(result, code=2)
 
 
 def test_pirel_version():
     result = runner.invoke(app, "--version")
-    assert result.exit_code == 0
+    check_exit_code(result)
+
     assert result.stdout.strip() == f"pirel {pirel.__version__}"

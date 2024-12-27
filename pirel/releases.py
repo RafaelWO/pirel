@@ -11,7 +11,7 @@ import humanize
 import typer
 from rich.table import Table
 
-from . import _cache, python_cli
+from . import _cache, _utils, python_cli
 
 DATE_NOW = datetime.date.today()
 RELEASE_CYCLE_URL = "https://raw.githubusercontent.com/python/devguide/refs/heads/main/include/release-cycle.json"
@@ -82,7 +82,7 @@ def wrap_style(text: str, style: str) -> str:
     return f"[{style.strip()}]{text}[/{style.strip()}]"
 
 
-class PythonRelease:
+class PythonRelease(_utils.VersionLike):
     def __init__(self, version: str, data: dict[str, Any]):
         self._version = version
         self._status: str = data["status"]
@@ -104,6 +104,10 @@ class PythonRelease:
     @property
     def version(self) -> str:
         return self._version
+
+    @property
+    def version_tuple(self) -> tuple[int, ...]:
+        return tuple(map(int, self._version.split(".")))
 
     @property
     def status(self) -> str:

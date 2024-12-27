@@ -6,12 +6,14 @@ import subprocess
 import sys
 from dataclasses import dataclass
 
+from . import _utils
+
 PYTHON_VERSION_RE = re.compile(r"Python ([23])\.(\d+)\.(\d+)")
 logger = logging.getLogger("pirel")
 
 
 @dataclass(frozen=True)
-class PythonVersion:
+class PythonVersion(_utils.VersionLike):
     major: int
     minor: int
     patch: int
@@ -33,6 +35,10 @@ class PythonVersion:
     @property
     def as_release(self) -> str:
         return f"{self.major}.{self.minor}"
+
+    @property
+    def version_tuple(self) -> tuple[int, int, int]:
+        return (self.major, self.minor, self.patch)
 
     def __str__(self) -> str:
         return f"{self.major}.{self.minor}.{self.patch}"

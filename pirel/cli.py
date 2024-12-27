@@ -7,6 +7,7 @@ from rich.console import Console
 
 import pirel
 
+from . import _cache
 from .logging import setup_logging
 from .python_cli import get_active_python_info
 from .releases import load_releases
@@ -61,6 +62,10 @@ def print_releases() -> None:
 @app.callback(invoke_without_command=True)
 def main(
     ctx: typer.Context,
+    no_cache: Annotated[
+        Optional[bool],
+        typer.Option("--no-cache", help="Clear cache before running"),
+    ] = None,
     verbose: VERBOSE_OPTION = 0,
     version: Annotated[
         Optional[bool],
@@ -73,6 +78,9 @@ def main(
     ] = None,
 ) -> None:
     """The Python release cycle in your terminal."""
+    if no_cache:
+        _cache.clear(clear_all=True)
+
     if not ctx.invoked_subcommand:
         # This hack is for backwards compatibility that "redirects" to the `list`
         # command if no command is passed.

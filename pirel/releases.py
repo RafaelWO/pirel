@@ -3,13 +3,15 @@ from __future__ import annotations
 import datetime
 import json
 import logging
+import urllib.error
 import urllib.request
 from typing import Any, Optional
 
 import humanize
+import typer
 from rich.table import Table
 
-from . import python_cli
+from . import _cache, python_cli
 
 DATE_NOW = datetime.date.today()
 RELEASE_CYCLE_URL = "https://raw.githubusercontent.com/python/devguide/refs/heads/main/include/release-cycle.json"
@@ -165,8 +167,29 @@ class PythonReleases:
 
 def load_releases() -> PythonReleases:
     """Downloads the release cycle data (JSON) from the Python devguide repo."""
-    logger.debug(f"Downloading Python release cycle data from URL {RELEASE_CYCLE_URL}")
-    with urllib.request.urlopen(RELEASE_CYCLE_URL) as f:
-        releases_data = json.load(f)
+    cache_file = _cache.get_latest_cache_file()
+    if cache_file and _cache.calc_cache_age_days(cache_file) <= 7:
+        logger.info(
+            f"Loading Python release cycle data from cache file {str(cache_file)!r}"
+        )
+        releases_data = _cache.load(cache_file)
+    else:
+        logger.info(
+            f"Downloading Python release cycle data from URL {RELEASE_CYCLE_URL!r}"
+        )
+        try:
+            with urllib.request.urlopen(RELEASE_CYCLE_URL) as f:
+                releases_data = json.load(f)
+            _cache.save(releases_data)
+        except urllib.error.URLError as ex:
+            logger.warning(
+                f"Failed to load data from URL {RELEASE_CYCLE_URL!r} due to {ex}"
+            )
+            if cache_file:
+                logger.warning(f"Falling back to old cache file {str(cache_file)!r}")
+                releases_data = _cache.load(cache_file)
+            else:
+                logger.error("Could not load data from URL or cache!")
+                raise typer.Exit(code=1)
 
     return PythonReleases(releases_data)

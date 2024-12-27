@@ -15,6 +15,7 @@ license = {file = "LICENSE"}
 requires-python = ">=3.8"
 dependencies = [
   "humanize>=4.10.0",
+  "platformdirs>=4.3.6",
   "rich>=13.9.2",
   "typer>=0.12.5",
   "typing-extensions>=4.12.2",
@@ -47,6 +48,7 @@ pirel = "pirel.cli:app"
 
 [dependency-groups]
 dev = [
+  "freezegun>=1.5.1",
   "mypy>=1.14.0",
   "pytest>=8.3.3",
   "pytest-cov>=5.0.0",

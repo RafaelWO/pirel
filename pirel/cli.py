@@ -17,7 +17,7 @@ if sys.version_info < (3, 9):
 else:
     from typing import Annotated
 
-RICH_CONSOLE = Console()
+RICH_CONSOLE = Console(highlight=False)
 
 
 app = typer.Typer(name="pirel")
@@ -116,7 +116,7 @@ def check_release() -> None:
     releases = load_releases()
     active_release = releases[py_info.version.as_release]
 
-    RICH_CONSOLE.print(f"\n{active_release}", highlight=False)
+    RICH_CONSOLE.print(f"\n{active_release}")
 
     if active_release.is_eol:
         raise typer.Exit(code=1)

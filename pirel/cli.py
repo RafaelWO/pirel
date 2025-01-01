@@ -7,7 +7,7 @@ from rich.console import Console
 
 import pirel
 
-from . import _cache
+from . import _cache, _guess
 from .logging import setup_logging
 from .python_cli import get_active_python_info
 from .releases import load_releases
@@ -120,6 +120,18 @@ def check_release() -> None:
 
     if active_release.is_eol:
         raise typer.Exit(code=1)
+
+
+@app.command("guess")
+def guess_release_question() -> None:
+    """Test your knowledge by answering a question regarding Python releases.
+
+    For example, "When was Python 3.9 released?" or "Who was the release manager for
+    Python 3.6?".
+    """
+    releases = load_releases()
+
+    _guess.ask_random_question(releases.as_list, RICH_CONSOLE)
 
 
 if __name__ == "__main__":

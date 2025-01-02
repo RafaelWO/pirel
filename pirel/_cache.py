@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import datetime
-import functools
 import json
 import pathlib
 from typing import Any, Dict, Optional, cast
@@ -37,7 +36,6 @@ def save(data: dict[str, Any]) -> None:
     clear()
 
 
-@functools.lru_cache(maxsize=None)
 def get_latest_cache_file() -> Optional[pathlib.Path]:
     """Returns the path to the latest cache file `None` if no cache exists."""
     return max(CACHE_DIR.glob(CACHE_FILE_GLOB), default=None)

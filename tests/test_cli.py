@@ -20,7 +20,7 @@ from rich.console import Console
 from typer.testing import CliRunner
 
 import pirel
-from pirel import _cache, _guess
+from pirel import _guess
 from pirel.cli import app
 from pirel.python_cli import PythonVersion
 from pirel.releases import load_releases
@@ -99,8 +99,6 @@ def cache_file(request, tmp_path):
         _cache_file = shutil.copyfile(
             RELEASE_CYCLE_DATA_PATH, cache_dir / cache_file_name
         )
-    # invalidate function cache
-    _cache.get_latest_cache_file.cache_clear()
 
     with mock.patch("pirel._cache.CACHE_DIR", cache_dir):
         yield _cache_file if cache_file_name else None, is_valid

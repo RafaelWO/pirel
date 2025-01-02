@@ -19,12 +19,26 @@ Types of changes:
 
 ## [Unreleased]
 
+### Added
+* Add global option `--version` (#10)
+* Create cache of release cycle data and add option `--no-cache` to clear cache (#12)
+* Add subcommand `guess` which allows users to test their knowledge about Python releases
+by answering questions based on the release cycle data (#13)
+
+### Changed
+* Subcommand `check` exits with code 1 if the version is end-of-life (#9)
+* Use global verbose option only in main callback (#9)
+  * I.e. `pirel --verbose check` works but `pirel check --verbose` does not
+
+### Internal
+* CI: Run publish workflow only if test suite succeeds (#11)
+
 ## [0.2.1] - 2024-12-20
 
-## Fixed
+### Fixed
 * Fix typo in end-of-life status message (#6)
 
-## Internal
+### Internal
 * Restructure and reformat README (#6)
 * Add mypy to test suite (#7)
 

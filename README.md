@@ -15,8 +15,14 @@
 
 
 ## Installation
-It is recommended to install Pirel as a globally available CLI tool via `pipx` (or `uv tool`, etc.).
+It is recommended to install Pirel as a globally available CLI tool via `uv` (or `pipx`, etc.).
 This way you Pirel will show you the status of your active Python interpreter.
+
+```
+uv tool install pirel
+```
+
+OR
 
 ```
 pipx install pirel
@@ -28,38 +34,79 @@ You can also install Pirel into a specific virtual environment.
 pip install pirel
 ```
 
+Not that in this case Pirel will only have access to the Python interpreter of this
+very virtual environment.
 
-## Usage
 
-### Check Active Python Version
+## CLI Docs
+**Usage**:
+
+```console
+$ pirel [OPTIONS] COMMAND [ARGS]...
 ```
-Usage: pirel check [OPTIONS]
+
+**Options**:
+
+* `--no-cache`: Clear cache before running
+* `-v, --verbose`: Enable verbose logging; can be supplied multiple times to increase verbosity. [default: 0]
+* `--version`: Dispay the version of pirel
+* `--install-completion`: Install completion for the current shell.
+* `--show-completion`: Show completion for the current shell, to copy it or customize the installation.
+* `--help`: Show this message and exit.
+
+**Commands**:
+
+* `check`: Shows release information about your active Python interpreter.
+* `guess`: Test your knowledge by answering a question regarding Python releases.
+* `list`: Lists all Python releases in a table.
+
+### `pirel check`
 
 Shows release information about your active Python interpreter.
+
+If the active version is end-of-life, the program exits with code 1.
 If no active Python interpreter is found, the program exits with code 2.
 
-╭─ Options ───────────────────────────────────────────────────────────────────────────────╮
-│ --verbose  -v      INTEGER  Enable verbose logging; can be supplied multiple times to   │
-│                             increase verbosity.                                         │
-│                             [default: 0]                                                │
-│ --help                      Show this message and exit.                                 │
-╰─────────────────────────────────────────────────────────────────────────────────────────╯
+**Usage**:
+
+```console
+$ pirel check [OPTIONS]
 ```
 
+**Options**:
 
-### List Python Releases
+* `--help`: Show this message and exit.
+
+### `pirel guess`
+
+Test your knowledge by answering a question regarding Python releases.
+
+For example, "When was Python 3.9 released?" or "Who was the release manager for
+Python 3.6?".
+
+**Usage**:
+
+```console
+$ pirel guess [OPTIONS]
 ```
-Usage: pirel list [OPTIONS]
+
+**Options**:
+
+* `--help`: Show this message and exit.
+
+### `pirel list`
 
 Lists all Python releases in a table. Your active Python interpreter is highlighted.
 
-╭─ Options ───────────────────────────────────────────────────────────────────────────────╮
-│ --verbose  -v      INTEGER  Enable verbose logging; can be supplied multiple times to   │
-│                             increase verbosity.                                         │
-│                             [default: 0]                                                │
-│ --help                      Show this message and exit.                                 │
-╰─────────────────────────────────────────────────────────────────────────────────────────╯
+**Usage**:
+
+```console
+$ pirel list [OPTIONS]
 ```
+
+**Options**:
+
+* `--help`: Show this message and exit.
 
 > [!NOTE]
 > You can still invoke `pirel` without a subcommand and you will get a table of all Python releases.

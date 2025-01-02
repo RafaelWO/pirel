@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+import functools
 import json
 import logging
 import urllib.error
@@ -11,7 +12,7 @@ import humanize
 import typer
 from rich.table import Table
 
-from . import _cache, python_cli
+from . import _cache, _utils, python_cli
 
 DATE_NOW = datetime.date.today()
 RELEASE_CYCLE_URL = "https://raw.githubusercontent.com/python/devguide/refs/heads/main/include/release-cycle.json"
@@ -82,12 +83,13 @@ def wrap_style(text: str, style: str) -> str:
     return f"[{style.strip()}]{text}[/{style.strip()}]"
 
 
-class PythonRelease:
+class PythonRelease(_utils.VersionLike):
     def __init__(self, version: str, data: dict[str, Any]):
         self._version = version
         self._status: str = data["status"]
         self._released = parse_date(data["first_release"])
         self._end_of_life = parse_date(data["end_of_life"])
+        self._release_manager = data["release_manager"]
 
     def __str__(self) -> str:
         status_info = STATUS_TO_TEXT[self._status].format(
@@ -104,6 +106,10 @@ class PythonRelease:
     @property
     def version(self) -> str:
         return self._version
+
+    @property
+    def version_tuple(self) -> tuple[int, ...]:
+        return tuple(map(int, self._version.split(".")))
 
     @property
     def status(self) -> str:
@@ -133,6 +139,10 @@ class PythonReleases:
 
     def __getitem__(self, version: str) -> PythonRelease:
         return self.releases[version]
+
+    @functools.cached_property
+    def as_list(self) -> list[PythonRelease]:
+        return list(self.releases.values())
 
     def to_table(
         self, active_python_version: Optional[python_cli.PythonVersion] = None

@@ -1,8 +1,15 @@
+from __future__ import annotations
+
+import csv
 import datetime
+import inspect
+import io
 import logging
 import pathlib
+import random
 import re
 import shutil
+import sys
 import traceback
 from unittest import mock
 
@@ -13,9 +20,10 @@ from rich.console import Console
 from typer.testing import CliRunner
 
 import pirel
-from pirel import _cache
+from pirel import _cache, _guess
 from pirel.cli import app
 from pirel.python_cli import PythonVersion
+from pirel.releases import load_releases
 
 runner = CliRunner()
 RELEASES_TABLE = """
@@ -54,6 +62,11 @@ DATE_FREEZE = datetime.date(2024, 11, 3)
 RELEASE_CYCLE_DATA_PATH = (
     pathlib.Path(__file__).parent / "data" / f"release-cycle_{DATE_FREEZE}.json"
 )
+QUESTION_CLASSES: list[type[_guess.Question]] = [
+    obj
+    for _, obj in inspect.getmembers(sys.modules["pirel._guess"], inspect.isclass)
+    if issubclass(obj, _guess.Question) and obj != _guess.Question
+]
 
 
 @pytest.fixture(scope="session")
@@ -62,16 +75,11 @@ def mock_time():
         yield
 
 
-@pytest.fixture(scope="module")
-def mock_rich_no_wrap():
-    with mock.patch("pirel.cli.RICH_CONSOLE", Console(soft_wrap=True, emoji=False)):
-        yield
-
-
-@pytest.fixture
-def release_cycle_file():
-    with RELEASE_CYCLE_DATA_PATH.open() as file:
-        yield file
+@pytest.fixture(scope="session", autouse=True)
+def mock_rich_console():
+    console = Console(soft_wrap=True, emoji=False)
+    with mock.patch("pirel.cli.RICH_CONSOLE", console):
+        yield console
 
 
 @pytest.fixture(
@@ -99,12 +107,28 @@ def cache_file(request, tmp_path):
 
 
 @pytest.fixture
-def mock_release_cycle_file(mock_time, release_cycle_file, cache_file):
+def stats_dir(tmp_path):
+    stats_dir = tmp_path / "pirel"
+    with mock.patch("pirel._guess.STATS_DIR", stats_dir):
+        yield stats_dir
+
+
+class MockRemoteReleasesFile:
+    def __enter__(self):
+        self.file_handle = RELEASE_CYCLE_DATA_PATH.open()
+        return self.file_handle
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.file_handle.close()
+
+
+@pytest.fixture
+def mock_release_cycle_file(mock_time, cache_file):
     # Mock date for reproducability
     with mock.patch("pirel.releases.DATE_NOW", DATE_FREEZE):
         with mock.patch("pirel.releases.urllib.request.urlopen") as mock_urlopen:
             # Mock call to release cycle data
-            mock_urlopen.return_value.__enter__.return_value = release_cycle_file
+            mock_urlopen.return_value = MockRemoteReleasesFile()
 
             yield mock_urlopen, cache_file[1]
 
@@ -124,6 +148,13 @@ def global_cli_args(request):
     return request.param
 
 
+@pytest.fixture(params=QUESTION_CLASSES)
+def question(request, mock_rich_console) -> _guess.Question:
+    releases = load_releases()
+    question = request.param(releases.as_list, mock_rich_console)
+    return question
+
+
 def check_exit_code(result: click.testing.Result, code: int = 0):
     """
     Helper to check the exit code of a typer/click app and inlcude the traceback if any.
@@ -139,7 +170,6 @@ def check_exit_code(result: click.testing.Result, code: int = 0):
 def test_pirel_list(
     args,
     log_count,
-    mock_rich_no_wrap,
     mock_release_cycle_file,
     releases_table,
     global_cli_args,
@@ -175,7 +205,7 @@ def test_pirel_list(
         mock_urlopen.assert_called_once()
 
 
-def test_pirel_check(mock_rich_no_wrap, mock_release_cycle_file, global_cli_args):
+def test_pirel_check(mock_release_cycle_file, global_cli_args):
     mock_urlopen, is_cache_valid = mock_release_cycle_file
     pyver = PythonVersion.this()
     expected_exit_code = (
@@ -211,3 +241,62 @@ def test_pirel_version():
     check_exit_code(result)
 
     assert result.stdout.strip() == f"pirel {pirel.__version__}"
+
+
+@pytest.mark.parametrize("correct", [True, False])
+def test_pirel_guess(
+    correct: bool,
+    question,
+    mock_release_cycle_file,
+    stats_dir: pathlib.Path,
+):
+    # Setup expected values
+    choice_enum = "abcd"
+    if correct:
+        # Randomly answer with the full name of the correct answer
+        # or the index (a, b, etc.)
+        if random.random() < 0.5:
+            user_response = question.correct_answer
+        else:
+            q_idx = question.choices.index(question.correct_answer)
+            user_response = choice_enum[q_idx]
+        question_response = f"{question.correct_answer} is correct!"
+    else:
+        user_response = next(
+            c for c in question.choices if c != question.correct_answer
+        )
+        question_response = (
+            f"{user_response} is wrong! (Correct answer: {question.correct_answer})"
+        )
+    _input = f"foo\n{user_response}"
+    choices = "\n".join(f" {i}) {c}" for i, c in zip(choice_enum, question.choices))
+    full_question = (
+        f"{question.format_question()}\n{choices}{_guess.PirelPrompt.prompt_suffix}"
+    )
+    expected_out = f"{full_question}Please select one of the available options or indices (a, b, etc.)\n{full_question}{question_response}"
+
+    # Mock stream for user prompt
+    with mock.patch("pirel._guess.PirelPrompt.stream", io.StringIO(_input)):
+        with mock.patch("pirel._guess.get_random_question") as m_question:
+            m_question.return_value = question
+            # Call CLI
+            result = runner.invoke(app, "guess")
+            check_exit_code(result, code=0)
+
+            assert result.stdout.strip() == expected_out
+
+    # Checks stats
+    stats_file = stats_dir / _guess.STATS_FILENAME
+    assert stats_file.exists()
+    expected_stats = {
+        "time": datetime.datetime.now().isoformat(),
+        "question_cls": question.__class__.__name__,
+        "target_release": question.target_release.version,
+        "score": int(correct),
+    }
+    with stats_file.open(newline="") as file:
+        reader = csv.DictReader(file, quoting=csv.QUOTE_NONNUMERIC)
+        data = [row for row in reader]
+
+    assert len(data) == 1
+    assert data[0] == expected_stats

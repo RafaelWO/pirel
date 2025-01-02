@@ -23,7 +23,6 @@ import pirel
 from pirel import _guess
 from pirel.cli import app
 from pirel.python_cli import PythonVersion
-from pirel.releases import load_releases
 
 runner = CliRunner()
 RELEASES_TABLE = """
@@ -75,11 +74,14 @@ def mock_time():
         yield
 
 
-@pytest.fixture(scope="session", autouse=True)
-def mock_rich_console():
-    console = Console(soft_wrap=True, emoji=False)
-    with mock.patch("pirel.cli.RICH_CONSOLE", console):
-        yield console
+@pytest.fixture(autouse=True)
+def mock_context():
+    # Recreate Pirel Context to ensure that data is loaded on every test
+    context = pirel.PirelContext()
+    # Disable wrapping line breaks and emojis during tests
+    context.rich_console = Console(soft_wrap=True, emoji=False)
+    with mock.patch("pirel.CONTEXT", context):
+        yield context
 
 
 @pytest.fixture(
@@ -147,9 +149,8 @@ def global_cli_args(request):
 
 
 @pytest.fixture(params=QUESTION_CLASSES)
-def question(request, mock_rich_console) -> _guess.Question:
-    releases = load_releases()
-    question = request.param(releases.as_list, mock_rich_console)
+def question(request) -> _guess.Question:
+    question = request.param(pirel.CONTEXT.releases.to_list())
     return question
 
 

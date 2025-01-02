@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import datetime
-import functools
 import json
 import logging
 import urllib.error
@@ -140,8 +139,7 @@ class PythonReleases:
     def __getitem__(self, version: str) -> PythonRelease:
         return self.releases[version]
 
-    @functools.cached_property
-    def as_list(self) -> list[PythonRelease]:
+    def to_list(self) -> list[PythonRelease]:
         return list(self.releases.values())
 
     def to_table(

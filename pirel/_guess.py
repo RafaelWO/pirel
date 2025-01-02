@@ -12,6 +12,8 @@ from rich.console import Console
 from rich.prompt import DefaultType, Prompt
 from rich.text import Text
 
+import pirel
+
 from .releases import PythonRelease
 
 STATS_DIR = platformdirs.user_data_path("pirel")
@@ -130,11 +132,10 @@ class Question(abc.ABC):
     target_release: PythonRelease
     get_target_field: Callable[[PythonRelease], str]
 
-    def __init__(self, releases: list[PythonRelease], console: Console):
+    def __init__(self, releases: list[PythonRelease]):
         if not hasattr(self, "target_release"):
             self.target_release = random.choice(releases)
         self.releases = releases
-        self.console = console
         self.choices = self.build_choices()
 
     @property
@@ -212,15 +213,18 @@ class Question(abc.ABC):
         prompt = PirelPrompt(
             self.format_question(),
             choices=self.choices,
-            console=self.console,
+            console=pirel.CONTEXT.rich_console,
         )
         answer = prompt(stream=PirelPrompt.stream)
         if answer == self.correct_answer:
-            self.console.print(f"[prompt.choices]{answer}[/] is [green]correct![/]")
+            pirel.CONTEXT.rich_console.print(
+                f"[prompt.choices]{answer}[/] is [green]correct![/]"
+            )
             return True
         else:
-            self.console.print(
-                f"[prompt.choices]{answer}[/] is [red]wrong![/] (Correct answer: [prompt.choices]{self.correct_answer}[/])"
+            pirel.CONTEXT.rich_console.print(
+                f"[prompt.choices]{answer}[/] is [red]wrong![/]"
+                f" (Correct answer: [prompt.choices]{self.correct_answer}[/])"
             )
             return False
 
@@ -229,10 +233,10 @@ class LatestVersionQuestion(Question):
     question: str = "What is the latest stable version of Python?"
     __doc__ = question
 
-    def __init__(self, releases: list[PythonRelease], console: Console):
+    def __init__(self, releases: list[PythonRelease]):
         self.target_release = max(filter(lambda x: x._status == "bugfix", releases))
         self.get_target_field = lambda x: x.version
-        super().__init__(releases, console)
+        super().__init__(releases)
 
     def incorrect_choices(self) -> list[PythonRelease]:
         return self.generate_incorrect_choices(lambda x: x.version.startswith("3"))
@@ -242,10 +246,10 @@ class VersionDateQuestion(Question):
     question: str = "When was Python {version} released?"
     __doc__ = question
 
-    def __init__(self, releases: list[PythonRelease], console: Console):
+    def __init__(self, releases: list[PythonRelease]):
         self.target_release = random.choice(releases)
         self.get_target_field = lambda x: x._released.isoformat()
-        super().__init__(releases, console)
+        super().__init__(releases)
 
     def format_question(self) -> str:
         return self.question.format(version=self.target_release.version)
@@ -255,10 +259,10 @@ class DateVersionQuestion(Question):
     question: str = "Which version of Python was released on {release_date}?"
     __doc__ = question
 
-    def __init__(self, releases: list[PythonRelease], console: Console):
+    def __init__(self, releases: list[PythonRelease]):
         self.target_release = random.choice(releases)
         self.get_target_field = lambda x: x.version
-        super().__init__(releases, console)
+        super().__init__(releases)
 
     def format_question(self) -> str:
         return self.question.format(release_date=self.target_release._released)
@@ -268,9 +272,9 @@ class ReleaseManagerVersionQuestion(Question):
     question: str = "Who was the release manager for Python {version}?"
     __doc__ = question
 
-    def __init__(self, releases: list[PythonRelease], console: Console):
+    def __init__(self, releases: list[PythonRelease]):
         self.get_target_field = lambda x: x._release_manager
-        super().__init__(releases, console)
+        super().__init__(releases)
 
     def format_question(self) -> str:
         return self.question.format(version=self.target_release._version)
@@ -301,12 +305,8 @@ def store_question_score(question: Question, score: int) -> None:
         )
 
 
-def get_random_question(releases: list[PythonRelease], console: Console) -> Question:
+def get_random_question() -> Question:
     """Randomly picks one of the available questions.
-
-    Args:
-        releases (list[PythonRelease]): A list of Python release objects.
-        console (Console): A rich Console instance.
 
     Returns:
         type[Question]: A class of type `Question`.
@@ -318,17 +318,4 @@ def get_random_question(releases: list[PythonRelease], console: Console) -> Ques
             if inspect.isclass(var) and issubclass(var, Question) and var != Question
         ]
     )
-    return question_cls(releases, console)
-
-
-def ask_random_question(releases: list[PythonRelease], console: Console) -> None:
-    """Prompt the user with one of the available questions and store the answer in user
-    data.
-
-    Args:
-        releases (list[PythonRelease]): A list of Python release objects.
-        console (Console): A rich Console instance.
-    """
-    question = get_random_question(releases, console)
-    score = int(question.ask())
-    store_question_score(question, score)
+    return question_cls(pirel.CONTEXT.releases.to_list())

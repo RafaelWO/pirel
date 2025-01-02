@@ -15,8 +15,14 @@
 
 
 ## Installation
-It is recommended to install Pirel as a globally available CLI tool via `pipx` (or `uv tool`, etc.).
+It is recommended to install Pirel as a globally available CLI tool via `uv` (or `pipx`, etc.).
 This way you Pirel will show you the status of your active Python interpreter.
+
+```
+uv tool install pirel
+```
+
+OR
 
 ```
 pipx install pirel
@@ -27,6 +33,9 @@ You can also install Pirel into a specific virtual environment.
 ```
 pip install pirel
 ```
+
+Not that in this case Pirel will only have access to the Python interpreter of this
+very virtual environment.
 
 
 ## CLI Docs

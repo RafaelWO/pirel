@@ -4,6 +4,7 @@ import abc
 import csv
 import datetime
 import inspect
+import logging
 import random
 from typing import Callable, Iterable, Optional, TextIO
 
@@ -19,6 +20,8 @@ from .releases import PythonRelease
 STATS_DIR = platformdirs.user_data_path("pirel")
 STATS_FILENAME = "guess_stats.csv"
 STATS_FIELDNAMES = ["time", "question_cls", "target_release", "score"]
+
+logger = logging.getLogger("pirel")
 
 
 class PirelPrompt(Prompt):
@@ -289,6 +292,13 @@ def store_question_score(question: Question, score: int) -> None:
         STATS_DIR.mkdir(parents=True)
 
     stats_file = STATS_DIR / STATS_FILENAME
+    question_type = question.__class__.__name__
+    logger.info(
+        "Storing score %d for question type %s in file '%s'",
+        score,
+        question_type,
+        stats_file,
+    )
     with stats_file.open("a", newline="") as file:
         writer = csv.DictWriter(
             file, fieldnames=STATS_FIELDNAMES, quoting=csv.QUOTE_NONNUMERIC

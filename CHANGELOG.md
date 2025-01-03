@@ -32,6 +32,8 @@ by answering questions based on the release cycle data (#13)
 
 ### Internal
 * CI: Run publish workflow only if test suite succeeds (#11)
+* Refactoring: Add global context and update tests (#14)
+
 
 ## [0.2.1] - 2024-12-20
 
@@ -41,6 +43,7 @@ by answering questions based on the release cycle data (#13)
 ### Internal
 * Restructure and reformat README (#6)
 * Add mypy to test suite (#7)
+
 
 ## [0.2.0] - 2024-12-15
 
@@ -52,6 +55,7 @@ by answering questions based on the release cycle data (#13)
 ### Changed
 * Move previous root command to subcommand `list` (#4)
   * To support backwards compatibility, invoking `pirel` will default to `pirel list`
+
 
 ## [0.1.1] - 2024-11-03
 
@@ -65,6 +69,7 @@ by answering questions based on the release cycle data (#13)
 
 ### Fixed
 * Fix Python version regex (allow alpha, beta, etc. versions)
+
 
 ## [0.1.0] - 2024-11-02
 

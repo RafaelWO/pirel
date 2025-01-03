@@ -6,7 +6,6 @@ import inspect
 import io
 import logging
 import pathlib
-import random
 import re
 import shutil
 import sys
@@ -20,10 +19,9 @@ from rich.console import Console
 from typer.testing import CliRunner
 
 import pirel
-from pirel import _cache, _guess
+from pirel import _guess
 from pirel.cli import app
 from pirel.python_cli import PythonVersion
-from pirel.releases import load_releases
 
 runner = CliRunner()
 RELEASES_TABLE = """
@@ -75,11 +73,14 @@ def mock_time():
         yield
 
 
-@pytest.fixture(scope="session", autouse=True)
-def mock_rich_console():
-    console = Console(soft_wrap=True, emoji=False)
-    with mock.patch("pirel.cli.RICH_CONSOLE", console):
-        yield console
+@pytest.fixture(autouse=True)
+def mock_context():
+    # Recreate Pirel Context to ensure that data is loaded on every test
+    context = pirel.PirelContext()
+    # Disable wrapping line breaks and emojis during tests
+    context.rich_console = Console(soft_wrap=True, emoji=False)
+    with mock.patch("pirel.CONTEXT", context):
+        yield context
 
 
 @pytest.fixture(
@@ -99,8 +100,6 @@ def cache_file(request, tmp_path):
         _cache_file = shutil.copyfile(
             RELEASE_CYCLE_DATA_PATH, cache_dir / cache_file_name
         )
-    # invalidate function cache
-    _cache.get_latest_cache_file.cache_clear()
 
     with mock.patch("pirel._cache.CACHE_DIR", cache_dir):
         yield _cache_file if cache_file_name else None, is_valid
@@ -149,9 +148,8 @@ def global_cli_args(request):
 
 
 @pytest.fixture(params=QUESTION_CLASSES)
-def question(request, mock_rich_console) -> _guess.Question:
-    releases = load_releases()
-    question = request.param(releases.as_list, mock_rich_console)
+def question(request) -> _guess.Question:
+    question = request.param(pirel.CONTEXT.releases.to_list())
     return question
 
 
@@ -243,9 +241,19 @@ def test_pirel_version():
     assert result.stdout.strip() == f"pirel {pirel.__version__}"
 
 
-@pytest.mark.parametrize("correct", [True, False])
+@pytest.mark.parametrize(
+    "correct, idx_answer",
+    [(True, True), (True, False), (False, True), (False, False)],
+    ids=[
+        "correct-idx_answer",
+        "correct-full_answer",
+        "wrong-idx_answer",
+        "wrong-full_answer",
+    ],
+)
 def test_pirel_guess(
-    correct: bool,
+    correct: bool,  # answer with correct or wrong answer
+    idx_answer: bool,  # answer with the index (a, b, etc.) or the name of the answer
     question,
     mock_release_cycle_file,
     stats_dir: pathlib.Path,
@@ -253,13 +261,7 @@ def test_pirel_guess(
     # Setup expected values
     choice_enum = "abcd"
     if correct:
-        # Randomly answer with the full name of the correct answer
-        # or the index (a, b, etc.)
-        if random.random() < 0.5:
-            user_response = question.correct_answer
-        else:
-            q_idx = question.choices.index(question.correct_answer)
-            user_response = choice_enum[q_idx]
+        user_response = question.correct_answer
         question_response = f"{question.correct_answer} is correct!"
     else:
         user_response = next(
@@ -268,6 +270,10 @@ def test_pirel_guess(
         question_response = (
             f"{user_response} is wrong! (Correct answer: {question.correct_answer})"
         )
+    if idx_answer:
+        q_idx = question.choices.index(user_response)
+        user_response = choice_enum[q_idx]
+
     _input = f"foo\n{user_response}"
     choices = "\n".join(f" {i}) {c}" for i, c in zip(choice_enum, question.choices))
     full_question = (

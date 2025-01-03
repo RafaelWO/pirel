@@ -3,21 +3,17 @@ import sys
 from typing import Optional
 
 import typer
-from rich.console import Console
 
 import pirel
 
 from . import _cache, _guess
 from .logging import setup_logging
 from .python_cli import get_active_python_info
-from .releases import load_releases
 
 if sys.version_info < (3, 9):
     from typing_extensions import Annotated
 else:
     from typing import Annotated
-
-RICH_CONSOLE = Console(highlight=False)
 
 
 app = typer.Typer(name="pirel")
@@ -55,8 +51,9 @@ def print_releases() -> None:
     py_info = get_active_python_info()
     py_version = py_info.version if py_info else None
 
-    releases = load_releases()
-    RICH_CONSOLE.print(releases.to_table(py_version), new_line_start=True)
+    pirel.CONTEXT.rich_console.print(
+        pirel.CONTEXT.releases.to_table(py_version), new_line_start=True
+    )
 
 
 @app.callback(invoke_without_command=True)
@@ -113,25 +110,26 @@ def check_release() -> None:
         )
         raise typer.Exit(code=2)
 
-    releases = load_releases()
-    active_release = releases[py_info.version.as_release]
+    active_release = pirel.CONTEXT.releases[py_info.version.as_release]
 
-    RICH_CONSOLE.print(f"\n{active_release}")
+    pirel.CONTEXT.rich_console.print(f"\n{active_release}")
 
     if active_release.is_eol:
         raise typer.Exit(code=1)
 
 
 @app.command("guess")
-def guess_release_question() -> None:
-    """Test your knowledge by answering a question regarding Python releases.
+def ask_random_question() -> None:
+    """Prompts the user with a random question regarding Python releases.
 
     For example, "When was Python 3.9 released?" or "Who was the release manager for
     Python 3.6?".
-    """
-    releases = load_releases()
 
-    _guess.ask_random_question(releases.as_list, RICH_CONSOLE)
+    The history is stored in the user data directory.
+    """
+    question = _guess.get_random_question()
+    score = int(question.ask())
+    _guess.store_question_score(question, score)
 
 
 if __name__ == "__main__":

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import datetime
-import functools
 import json
 import logging
 import urllib.error
@@ -103,6 +102,9 @@ class PythonRelease(_utils.VersionLike):
             f" [{_eol_color}](EOL {self._end_of_life})[/{_eol_color}]"
         )
 
+    def __repr__(self) -> str:
+        return f"PythonRelease({self.version})"
+
     @property
     def version(self) -> str:
         return self._version
@@ -140,8 +142,7 @@ class PythonReleases:
     def __getitem__(self, version: str) -> PythonRelease:
         return self.releases[version]
 
-    @functools.cached_property
-    def as_list(self) -> list[PythonRelease]:
+    def to_list(self) -> list[PythonRelease]:
         return list(self.releases.values())
 
     def to_table(

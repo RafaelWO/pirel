@@ -6,7 +6,6 @@ import inspect
 import io
 import logging
 import pathlib
-import random
 import re
 import shutil
 import sys
@@ -242,9 +241,19 @@ def test_pirel_version():
     assert result.stdout.strip() == f"pirel {pirel.__version__}"
 
 
-@pytest.mark.parametrize("correct", [True, False])
+@pytest.mark.parametrize(
+    "correct, idx_answer",
+    [(True, True), (True, False), (False, True), (False, False)],
+    ids=[
+        "correct-idx_answer",
+        "correct-full_answer",
+        "wrong-idx_answer",
+        "wrong-full_answer",
+    ],
+)
 def test_pirel_guess(
-    correct: bool,
+    correct: bool,  # answer with correct or wrong answer
+    idx_answer: bool,  # answer with the index (a, b, etc.) or the name of the answer
     question,
     mock_release_cycle_file,
     stats_dir: pathlib.Path,
@@ -252,13 +261,7 @@ def test_pirel_guess(
     # Setup expected values
     choice_enum = "abcd"
     if correct:
-        # Randomly answer with the full name of the correct answer
-        # or the index (a, b, etc.)
-        if random.random() < 0.5:
-            user_response = question.correct_answer
-        else:
-            q_idx = question.choices.index(question.correct_answer)
-            user_response = choice_enum[q_idx]
+        user_response = question.correct_answer
         question_response = f"{question.correct_answer} is correct!"
     else:
         user_response = next(
@@ -267,6 +270,10 @@ def test_pirel_guess(
         question_response = (
             f"{user_response} is wrong! (Correct answer: {question.correct_answer})"
         )
+    if idx_answer:
+        q_idx = question.choices.index(user_response)
+        user_response = choice_enum[q_idx]
+
     _input = f"foo\n{user_response}"
     choices = "\n".join(f" {i}) {c}" for i, c in zip(choice_enum, question.choices))
     full_question = (

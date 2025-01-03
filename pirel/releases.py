@@ -102,6 +102,9 @@ class PythonRelease(_utils.VersionLike):
             f" [{_eol_color}](EOL {self._end_of_life})[/{_eol_color}]"
         )
 
+    def __repr__(self) -> str:
+        return f"PythonRelease({self.version})"
+
     @property
     def version(self) -> str:
         return self._version

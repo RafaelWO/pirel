@@ -141,6 +141,9 @@ class Question(abc.ABC):
         self.releases = releases
         self.choices = self.build_choices()
 
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}({self.target_release.version})"
+
     @property
     def correct_answer(self) -> str:
         """Returns the correct answer as a string by calling `get_target_field` on the

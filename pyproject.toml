@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "pirel"
-version = "0.2.1"
+version = "0.3.0"
 description = "The Python release cycle in your terminal"
 authors = [
   {name = "Rafael Weingartner-Ortner", email = "weingartner.rafael@hotmail.com"}

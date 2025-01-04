@@ -39,6 +39,9 @@ very virtual environment.
 
 
 ## CLI Docs
+
+<!-- Typer Docs START -->
+
 **Usage**:
 
 ```console
@@ -48,7 +51,7 @@ $ pirel [OPTIONS] COMMAND [ARGS]...
 **Options**:
 
 * `--no-cache`: Clear cache before running
-* `-v, --verbose`: Enable verbose logging; can be supplied multiple times to increase verbosity. [default: 0]
+* `-v, --verbose`: Enable verbose logging; can be supplied multiple times to increase verbosity.  [default: 0]
 * `--version`: Dispay the version of pirel
 * `--install-completion`: Install completion for the current shell.
 * `--show-completion`: Show completion for the current shell, to copy it or customize the installation.
@@ -57,7 +60,7 @@ $ pirel [OPTIONS] COMMAND [ARGS]...
 **Commands**:
 
 * `check`: Shows release information about your active Python interpreter.
-* `guess`: Test your knowledge by answering a question regarding Python releases.
+* `guess`: Prompts the user with a random question regarding Python releases.
 * `list`: Lists all Python releases in a table.
 
 ### `pirel check`
@@ -79,10 +82,12 @@ $ pirel check [OPTIONS]
 
 ### `pirel guess`
 
-Test your knowledge by answering a question regarding Python releases.
+Prompts the user with a random question regarding Python releases.
 
 For example, "When was Python 3.9 released?" or "Who was the release manager for
 Python 3.6?".
+
+The history is stored in the user data directory.
 
 **Usage**:
 
@@ -107,6 +112,8 @@ $ pirel list [OPTIONS]
 **Options**:
 
 * `--help`: Show this message and exit.
+
+<!-- Typer Docs END -->
 
 > [!NOTE]
 > You can still invoke `pirel` without a subcommand and you will get a table of all Python releases.

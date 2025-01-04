@@ -1,15 +1,14 @@
 name: Publish
+
 on:
-  workflow_run:
-    workflows: ['Test suite']
-    types: [completed]
+  release:
+    types:
+      - created
 
 jobs:
   pypi-publish:
     name: Build package and upload it to PyPI
     runs-on: ubuntu-latest
-    # Run only on tags and if test suite was successful
-    if: ${{ github.ref_type == 'tag' && github.event.workflow_run.conclusion == 'success' }}
     # Specifying a GitHub environment is optional, but strongly encouraged
     environment: pypi
     permissions:

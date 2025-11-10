@@ -14,7 +14,7 @@ from rich.table import Table
 from . import _cache, _utils, python_cli
 
 DATE_NOW = datetime.date.today()
-RELEASE_CYCLE_URL = "https://raw.githubusercontent.com/python/devguide/refs/heads/main/include/release-cycle.json"
+RELEASE_CYCLE_URL = "https://peps.python.org/api/release-cycle.json"
 
 STATUS_TO_TEXT = {
     "feature": "is [bold]not released yet[/bold] and still accepts new features",

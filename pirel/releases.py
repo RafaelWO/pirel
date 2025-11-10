@@ -62,7 +62,7 @@ def status_style(status: str) -> str:
     elif status == "feature":
         return "magenta"
     else:
-        raise ValueError(f"Unkown status {status}")
+        raise ValueError(f"Unknown status {status}")
 
 
 def eol_color(eol: datetime.date) -> str:

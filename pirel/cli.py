@@ -1,6 +1,5 @@
 import logging
-import sys
-from typing import Optional
+from typing import Annotated, Optional
 
 import typer
 
@@ -9,12 +8,6 @@ import pirel
 from . import _cache, _guess
 from .logging import setup_logging
 from .python_cli import get_active_python_info
-
-if sys.version_info < (3, 9):
-    from typing_extensions import Annotated
-else:
-    from typing import Annotated
-
 
 app = typer.Typer(name="pirel")
 logger = logging.getLogger("pirel")

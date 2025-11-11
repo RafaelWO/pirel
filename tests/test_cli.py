@@ -55,6 +55,7 @@ PYVER_TO_CHECK_OUTPUT = {
     "3.11": ":heavy_check_mark: You are using Python 3.11 which has security support for more than 2 years (EOL 2027-10-01)",
     "3.12": ":rocket: You are using Python 3.12 which is actively maintained (bugfixes) and has security support for more than 3 years (EOL 2028-10-01)",
     "3.13": ":rocket: You are using Python 3.13 which is actively maintained (bugfixes) and has security support for more than 4 years (EOL 2029-10-01)",
+    "3.14": ":sparkles: You are using Python 3.14 which is not released yet and still accepts new features (EOL 2030-10-01)",
 }
 DATE_FREEZE = datetime.date(2024, 11, 3)
 RELEASE_CYCLE_DATA_PATH = (

@@ -19,6 +19,19 @@ Types of changes:
 
 ## [Unreleased]
 
+## [0.4.0] - 2025-11-11
+
+### Added
+* Add support for Python 3.14 (#17)
+  * No real changes required other than adjusting the tests and enabling 3.14 in CI
+
+### Changed
+* Update release-cycle.json URL (#16 by @hugovk)
+  * Also, fix a typo in an exception message
+
+### Removed
+* Remove support for Python 3.8 and 3.9 due to EOL (#17)
+  * Also, remove the dependency to `typing_extensions` because with >=3.10 everything we need is in the standard `typing` module
 
 ## [0.3.0] - 2025-01-04
 
@@ -80,7 +93,8 @@ by answering questions based on the release cycle data (#13)
 * Basic CLI app that shows all Python releases with the active Python interpeter being highlighted
 
 
-[unreleased]: https://github.com/RafaelWO/pirel/compare/0.3.0...HEAD
+[unreleased]: https://github.com/RafaelWO/pirel/compare/0.4.0...HEAD
+[0.4.0]: https://github.com/RafaelWO/pirel/compare/0.3.0...0.4.0
 [0.3.0]: https://github.com/RafaelWO/pirel/compare/0.2.1...0.3.0
 [0.2.1]: https://github.com/RafaelWO/pirel/compare/0.2.0...0.2.1
 [0.2.0]: https://github.com/RafaelWO/pirel/compare/0.1.1...0.2.0

@@ -4,13 +4,13 @@ from rich.console import Console
 
 from pirel.releases import PythonReleases, load_releases
 
-__version__ = "0.3.0"
+__version__ = "0.4.0"
 
 
 class PirelContext:
     """Contains objects that should be shared within the CLI application.
 
-    The intutition behind this context class is to make some objects, like the rich
+    The intuition behind this context class is to make some objects, like the rich
     console or the release cycle data object globally available.
 
     Since we don't have to load the releases data if a user runs e.g. `pirel --version`,

@@ -4,6 +4,12 @@ on:
   release:
     types:
       - published
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "The git tag to check out and publish"
+        required: true
+        type: string
 
 jobs:
   pypi-publish:
@@ -19,7 +25,7 @@ jobs:
       - name: Checkout current branch
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.release.tag_name }}
+          ref: ${{ inputs.tag }}
 
       - name: Install uv
         uses: astral-sh/setup-uv@v3

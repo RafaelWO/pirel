@@ -28,12 +28,12 @@ RELEASES_TABLE = """
 ┏━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━━┓
 ┃ Version ┃      Status ┃   Released ┃ End-of-life ┃
 ┡━━━━━━━━━╇━━━━━━━━━━━━━╇━━━━━━━━━━━━╇━━━━━━━━━━━━━┩
-│    3.14 │     feature │ 2025-10-01 │  2030-10-01 │
-│    3.13 │      bugfix │ 2024-10-07 │  2029-10-01 │
-│    3.12 │      bugfix │ 2023-10-02 │  2028-10-01 │
-│    3.11 │    security │ 2022-10-24 │  2027-10-01 │
-│    3.10 │    security │ 2021-10-04 │  2026-10-01 │
-│     3.9 │    security │ 2020-10-05 │  2025-10-01 │
+│    3.14 │     feature │ 2025-10-01 │  2030-10-31 │
+│    3.13 │      bugfix │ 2024-10-07 │  2029-10-31 │
+│    3.12 │      bugfix │ 2023-10-02 │  2028-10-31 │
+│    3.11 │    security │ 2022-10-24 │  2027-10-31 │
+│    3.10 │    security │ 2021-10-04 │  2026-10-31 │
+│     3.9 │    security │ 2020-10-05 │  2025-10-31 │
 │     3.8 │ end-of-life │ 2019-10-14 │  2024-10-07 │
 │     3.7 │ end-of-life │ 2018-06-27 │  2023-06-27 │
 │     3.6 │ end-of-life │ 2016-12-23 │  2021-12-23 │
@@ -50,12 +50,12 @@ RELEASES_TABLE = """
 
 PYVER_TO_CHECK_OUTPUT = {
     "3.8": ":warning: You are using Python 3.8 which has reached end-of-life! Please upgrade to a newer version of Python (EOL 2024-10-07)",
-    "3.9": ":heavy_check_mark: You are using Python 3.9 which has security support for more than 10 months (EOL 2025-10-01)",
-    "3.10": ":heavy_check_mark: You are using Python 3.10 which has security support for more than 1 year, 10 months (EOL 2026-10-01)",
-    "3.11": ":heavy_check_mark: You are using Python 3.11 which has security support for more than 2 years (EOL 2027-10-01)",
-    "3.12": ":rocket: You are using Python 3.12 which is actively maintained (bugfixes) and has security support for more than 3 years (EOL 2028-10-01)",
-    "3.13": ":rocket: You are using Python 3.13 which is actively maintained (bugfixes) and has security support for more than 4 years (EOL 2029-10-01)",
-    "3.14": ":sparkles: You are using Python 3.14 which is not released yet and still accepts new features (EOL 2030-10-01)",
+    "3.9": ":heavy_check_mark: You are using Python 3.9 which has security support for more than 11 months (EOL 2025-10-31)",
+    "3.10": ":heavy_check_mark: You are using Python 3.10 which has security support for more than 1 year, 11 months (EOL 2026-10-31)",
+    "3.11": ":heavy_check_mark: You are using Python 3.11 which has security support for more than 2 years (EOL 2027-10-31)",
+    "3.12": ":rocket: You are using Python 3.12 which is actively maintained (bugfixes) and has security support for more than 3 years (EOL 2028-10-31)",
+    "3.13": ":rocket: You are using Python 3.13 which is actively maintained (bugfixes) and has security support for more than 4 years (EOL 2029-10-31)",
+    "3.14": ":sparkles: You are using Python 3.14 which is not released yet and still accepts new features (EOL 2030-10-31)",
 }
 DATE_FREEZE = datetime.date(2024, 11, 3)
 RELEASE_CYCLE_DATA_PATH = (
@@ -210,6 +210,8 @@ def test_pirel_check(mock_release_cycle_file, global_cli_args):
     expected_exit_code = (
         1 if "end-of-life" in PYVER_TO_CHECK_OUTPUT[pyver.as_release] else 0
     )
+
+    print(f"Frozen date is: {DATE_FREEZE}")
 
     # Call CLI
     _args = [*global_cli_args, "check"]

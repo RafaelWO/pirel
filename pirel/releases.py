@@ -1,11 +1,12 @@
 from __future__ import annotations
 
+import calendar
 import datetime
 import json
 import logging
 import urllib.error
 import urllib.request
-from typing import Any, Optional
+from typing import Any, Literal, Optional
 
 import humanize
 import typer
@@ -35,10 +36,16 @@ STATUS_TO_EMOJI = {
 logger = logging.getLogger("pirel")
 
 
-def parse_date(date_str: str) -> datetime.date:
+def parse_date(
+    date_str: str, default_day: Literal["first", "last"] = "last"
+) -> datetime.date:
     if len(date_str) == len("yyyy-mm"):
-        # We need a full yyyy-mm-dd, so let's approximate
-        return datetime.date.fromisoformat(date_str + "-01")
+        if default_day == "last":
+            last_day_of_month = calendar.monthrange(*map(int, date_str.split("-")))[1]
+            _date_str = f"{date_str}-{last_day_of_month}"
+        else:
+            _date_str = f"{date_str}-01"
+        return datetime.date.fromisoformat(_date_str)
     return datetime.date.fromisoformat(date_str)
 
 

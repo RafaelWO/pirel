@@ -69,7 +69,7 @@ def status_style(status: str) -> str:
     elif status == "feature":
         return "magenta"
     else:
-        raise ValueError(f"Unknown status {status}")
+        return "gray"
 
 
 def eol_color(eol: datetime.date) -> str:
@@ -122,7 +122,7 @@ class PythonRelease(_utils.VersionLike):
 
     @property
     def status(self) -> str:
-        return wrap_style(self._status, status_style(self._status))
+        return wrap_style(self._status or "n/a", status_style(self._status))
 
     @property
     def released(self) -> str:

@@ -4,7 +4,7 @@ from rich.console import Console
 
 from pirel.releases import PythonReleases, load_releases
 
-__version__ = "0.4.0"
+__version__ = "0.4.1"
 
 
 class PirelContext:

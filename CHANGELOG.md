@@ -19,6 +19,20 @@ Types of changes:
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-03-15
+
+### Changed
+* Change default EOL day to be end of the month (#19)
+
+### Fixed
+* Fix error if status is empty
+  * For Python 3.16, the `release-cycle.json` had an empty string for the field `status`
+  * The logic now handles empty or unknown statuses gracefully
+
+### Internal
+* Fix GH workflow for publishing a release
+
+
 ## [0.4.0] - 2025-11-11
 
 ### Added

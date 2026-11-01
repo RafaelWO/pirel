@@ -107,7 +107,8 @@ by answering questions based on the release cycle data (#13)
 * Basic CLI app that shows all Python releases with the active Python interpeter being highlighted
 
 
-[unreleased]: https://github.com/RafaelWO/pirel/compare/0.4.0...HEAD
+[unreleased]: https://github.com/RafaelWO/pirel/compare/0.4.1...HEAD
+[0.4.1]: https://github.com/RafaelWO/pirel/compare/0.4.0...0.4.1
 [0.4.0]: https://github.com/RafaelWO/pirel/compare/0.3.0...0.4.0
 [0.3.0]: https://github.com/RafaelWO/pirel/compare/0.2.1...0.3.0
 [0.2.1]: https://github.com/RafaelWO/pirel/compare/0.2.0...0.2.1
